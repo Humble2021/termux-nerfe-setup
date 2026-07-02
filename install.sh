@@ -34,7 +34,7 @@ echo
 echo "[3/7] Requesting storage permission..."
 termux-setup-storage
 
-# Wait a moment for Android to create the storage links
+
 sleep 3
 
 echo
