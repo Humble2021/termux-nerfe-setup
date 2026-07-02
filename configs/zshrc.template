@@ -1,0 +1,21 @@
+clear
+echo -e "\e[36m"
+cat ~/.config/termux/banner.txt
+echo -e "\e[0m"
+
+fastfetch --logo arch
+
+PROMPT='%F{cyan}┌──(termux㉿__USERNAME__)-[%~]
+└─$ %f'
+
+autoload -Uz compinit
+compinit
+
+alias cls='clear'
+alias py='python'
+alias update='pkg update && pkg upgrade -y'
+alias copy='termux-clipboard-set'
+alias paste='termux-clipboard-get'
+
+source ~/.zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+source ~/.zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
