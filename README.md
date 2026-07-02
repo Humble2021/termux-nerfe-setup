@@ -5,7 +5,7 @@ Run:
 ```bash
 pkg update && pkg upgrade -y
 pkg install git
-git clone <YOUR_REPO_URL>
+git clone https://github.com/Humble2021/termux-nerfe-setup.git
 cd termux-nerfe-setup
 bash install.sh
 ```
