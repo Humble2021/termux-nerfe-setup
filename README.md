@@ -11,8 +11,6 @@ bash install.sh
 ```
 
 The installer will:
-- Ask for prompt username
-- Ask for banner name
 - Install packages
 - Setup storage
 - Create Workplace on shared storage
