@@ -2,17 +2,24 @@
 
 set -e
 
-echo "======================================"
-echo "  Nerfe Termux Environment Installer"
-echo "======================================"
+clear
+
+echo "========================================"
+echo "   Nerfe Termux Setup Installer"
+echo "========================================"
 echo
 
-echo "[1/7] Updating packages..."
+if [ -z "$PREFIX" ]; then
+    echo "Error: This installer must be run inside Termux."
+    exit 1
+fi
+
+echo "[1/8] Updating packages..."
 pkg update -y
 pkg upgrade -y
 
 echo
-echo "[2/7] Installing packages..."
+echo "[2/8] Installing required packages..."
 pkg install -y \
     zsh \
     git \
@@ -31,75 +38,83 @@ pkg install -y \
     unzip
 
 echo
-echo "[3/7] Requesting storage permission..."
+echo "[3/8] Requesting storage permission..."
 termux-setup-storage
 
-
-sleep 3
+echo "Waiting for Android to finish..."
+sleep 5
 
 echo
-echo "[4/7] Creating Workplace shortcut..."
+echo "[4/8] Creating Workplace folder..."
+
 if [ -d "$HOME/storage/shared" ]; then
     mkdir -p "$HOME/storage/shared/Workplace"
     ln -sfn "$HOME/storage/shared/Workplace" "$HOME/Workplace"
     echo "✓ Workplace linked."
 else
     echo "⚠ Storage permission not granted."
-    echo "Grant permission and rerun the script if you want the Workplace link."
+    echo "Skipping Workplace symlink."
 fi
 
 echo
-echo "[5/7] Installing Zsh plugins..."
+echo "[5/8] Installing Zsh plugins..."
 
 mkdir -p ~/.zsh/plugins
 
-[ -d ~/.zsh/plugins/zsh-autosuggestions ] || \
-git clone https://github.com/zsh-users/zsh-autosuggestions \
-~/.zsh/plugins/zsh-autosuggestions
+if [ ! -d ~/.zsh/plugins/zsh-autosuggestions ]; then
+    git clone https://github.com/zsh-users/zsh-autosuggestions \
+        ~/.zsh/plugins/zsh-autosuggestions
+fi
 
-[ -d ~/.zsh/plugins/zsh-syntax-highlighting ] || \
-git clone https://github.com/zsh-users/zsh-syntax-highlighting \
-~/.zsh/plugins/zsh-syntax-highlighting
-
-echo
-echo "[6/7] Creating .zshrc..."
-
-cat > ~/.zshrc <<'EOF'
-clear
-
-# Banner
-echo -e "\e[36m"
-echo "███╗   ██╗███████╗██████╗ ███████╗███████╗"
-echo "████╗  ██║██╔════╝██╔══██╗██╔════╝██╔════╝"
-echo "██╔██╗ ██║█████╗  ██████╔╝█████╗  █████╗  "
-echo "██║╚██╗██║██╔══╝  ██╔══██╗██╔══╝  ██╔══╝  "
-echo "██║ ╚████║███████╗██║  ██║██║     ███████╗"
-echo "╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝╚═╝     ╚══════╝"
-echo -e "\e[0m"
-
-fastfetch --logo arch
-
-PROMPT='%F{cyan}┌──(termux㉿Nerfe)-[%~]
-└─$ %f'
-
-alias cls='clear'
-alias py='python'
-alias update='pkg update && pkg upgrade -y'
-alias copy='termux-clipboard-set'
-alias paste='termux-clipboard-get'
-
-source ~/.zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
-source ~/.zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-EOF
+if [ ! -d ~/.zsh/plugins/zsh-syntax-highlighting ]; then
+    git clone https://github.com/zsh-users/zsh-syntax-highlighting \
+        ~/.zsh/plugins/zsh-syntax-highlighting
+fi
 
 echo
-echo "[7/7] Switching to Zsh..."
+echo "[6/8] Installing .zshrc..."
+
+if [ -f configs/zshrc.template ]; then
+    cp configs/zshrc.template ~/.zshrc
+    echo "✓ Installed .zshrc"
+else
+    echo "✗ configs/zshrc.template not found."
+    exit 1
+fi
+
+echo
+echo "[7/8] Installing Termux configuration..."
+
+mkdir -p ~/.termux
+
+if [ -f configs/termux.properties ]; then
+    cp configs/termux.properties ~/.termux/termux.properties
+    termux-reload-settings
+    echo "✓ Installed termux.properties"
+else
+    echo "⚠ configs/termux.properties not found."
+fi
+
+echo
+echo "[8/8] Changing default shell..."
 
 chsh -s zsh || true
 
 echo
-echo "======================================"
+echo "========================================"
 echo " Installation Complete!"
-echo "======================================"
+echo "========================================"
 echo
-echo "Restart Termux to apply all changes."
+echo "Please restart Termux."
+echo
+echo "Installed:"
+echo "  ✓ Zsh"
+echo "  ✓ Fastfetch"
+echo "  ✓ Git"
+echo "  ✓ Python"
+echo "  ✓ Node.js"
+echo "  ✓ Developer tools"
+echo "  ✓ Zsh plugins"
+echo "  ✓ Nerfe configuration"
+echo
+echo "Enjoy!"
